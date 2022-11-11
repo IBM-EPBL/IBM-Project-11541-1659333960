@@ -1,0 +1,40 @@
+import wiotp.sdk.device
+import time
+import os
+import datetime
+import random
+
+myConfig = {
+    "identity": {
+        "orgId": "z45pp6",
+        "typeId": "project",
+        "deviceId":"12345"
+    },
+    "auth":{
+        "token":"9944445266"
+    }
+}
+def new_func():
+    return wiotp.sdk.device
+
+client = new_func().DeviceClient(config=myConfig, logHandlers=None)
+client.connect()
+
+def myCommandCallback(cmd):
+    print("Message Received from IBM IOT Platform: %s" % cmd.data['command'])
+    m=cmd.data['command']
+    if(m=="motoron"):
+        print("Motor is switched on")
+    elif(m=="motoroff"):
+        print("Motor is switched off")
+    print(" ")
+while True:
+    soil=random.randint(0, 100)
+    temp=random.randint(-20, 125)
+    hum=random.randint(0, 100)
+    myData={'soil_moisture':soil,'temperature':temp,'humidity':hum}
+    client.publishEvent(eventId="status", msgFormat="json", data=myData, qos=0, onPublish=None)
+    print("Published Data Successfully: %s", myData)
+    time.sleep(2)
+    client.myCommandCallback = myCommandCallback
+client.disconnnect()
